@@ -43,4 +43,4 @@ def _regex_match(f, regex):
 
 
 if __name__ == "__main__":
-    tree("C:\\Users\\Isaac Chen")
+    tree(".")
