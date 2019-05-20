@@ -25,31 +25,40 @@ def tree(d, max_depth=-1, include_file=True, pretty_print=True, ignore=[]):
     if os.path.isfile(d):
         print(d)
         return
-    _recur_read(d, 0, max_depth, include_file, pretty_print, ignore, "")
+    _recur_read(d, 0, max_depth, include_file, pretty_print, ignore, False)
 
 
-def _recur_read(parent, depth, max_depth, include_file, pretty_print, ignore, preline):
+def _recur_read(parent, depth, max_depth, include_file, pretty_print, ignore, is_end):
     "Recursively reading files"
     if max_depth >= 0 and depth >= max_depth:
         return
     if _regex_match(parent, ignore):
         return
-    for i in os.listdir(parent):
-        fullpath = os.path.join(parent, i)
-        pre = ""
+    files = os.listdir(parent)
+    for i in range(len(files)):
+        f = files[i]
+        fullpath = os.path.join(parent, f)
+        end = (i == len(files)-1)
+        is_file = os.path.isfile(fullpath)
         if pretty_print:
-            pre = _pretty_format(depth, i, preline)
+            _pretty_format(depth, f, is_end, is_file)
         else:
-            print(depth*"    " + i)
-        if os.path.isfile(fullpath):
+            print(depth*"    " + f)
+        if is_file:
             continue
-        _recur_read(fullpath, depth+1, max_depth, include_file, pretty_print, ignore, pre)
+        _recur_read(fullpath, depth+1, max_depth, include_file, pretty_print, ignore, end)
 
 
-def _pretty_format(d, f, pre_line):
-    print(len(pre_line)*" " +  "|")
-    print(len(pre_line)*" " + "|" + "--- " + f)
-    return len(pre_line)*" " + "|" + "--- "
+def _pretty_format(d, f, is_end, is_file):
+    if is_end and is_file:
+        top = "|    " * (d-1) + "     |"
+        bot = "|    " * (d-1) + "     +--- " + f
+    else:
+        top = "|    " * d + "|"
+        bot = "|    " * d + "+--- " + f
+    print(top)
+    print(bot)
+    return d*"    " + "|" + "--- "
 
 
 def _regex_match(f, regex):
@@ -65,4 +74,4 @@ def _regex_match(f, regex):
 
 
 if __name__ == "__main__":
-    tree("mock")
+    tree(".")
