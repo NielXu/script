@@ -34,7 +34,7 @@ def _regex_match(f, regex):
     "Check if f matches the regex, return True if it is"
     for i in regex:
         if type(i) == str:
-            pat = re.compile(regex)
+            pat = re.compile(i)
         else:
             pat = i
         if pat.match(f):
