@@ -22,43 +22,33 @@ def tree(d, max_depth=-1, include_file=True, pretty_print=True, ignore=[]):
     """
     if not os.path.isdir(d):
         raise Exception(str(d)+": is not a directory")
-    if os.path.isfile(d):
-        print(d)
-        return
-    _recur_read(d, 0, max_depth, include_file, pretty_print, ignore, False)
+    _recur_read(d, 0, max_depth, include_file, pretty_print, ignore, "     ")
 
 
-def _recur_read(parent, depth, max_depth, include_file, pretty_print, ignore, is_end):
+def _recur_read(parent, depth, max_depth, include_file, pretty_print, ignore, pad):
     "Recursively reading files"
     if max_depth >= 0 and depth >= max_depth:
         return
     if _regex_match(parent, ignore):
         return
-    files = os.listdir(parent)
-    for i in range(len(files)):
-        f = files[i]
-        fullpath = os.path.join(parent, f)
-        end = (i == len(files)-1)
-        is_file = os.path.isfile(fullpath)
-        if pretty_print:
-            _pretty_format(depth, f, is_end, is_file)
-        else:
-            print(depth*"    " + f)
-        if is_file:
-            continue
-        _recur_read(fullpath, depth+1, max_depth, include_file, pretty_print, ignore, end)
-
-
-def _pretty_format(d, f, is_end, is_file):
-    if is_end and is_file:
-        top = "|    " * (d-1) + "     |"
-        bot = "|    " * (d-1) + "     +--- " + f
+    print(pad[0:-5] + "+--- " + os.path.split(parent)[-1])
+    files = []
+    if include_file:
+        files = os.listdir(parent)
     else:
-        top = "|    " * d + "|"
-        bot = "|    " * d + "+--- " + f
-    print(top)
-    print(bot)
-    return d*"    " + "|" + "--- "
+        files = [x for x in os.listdir(parent) if os.path.isdir(os.path.join(parent, x))]
+    count = 0
+    for file in files:
+        count += 1
+        print(pad + "|    ")
+        path = os.path.join(parent, file)
+        if os.path.isdir(path):
+            if count == len(files):
+                _recur_read(path, depth+1, max_depth, include_file, pretty_print, ignore, pad + "     ")
+            else:
+                _recur_read(path, depth+1, max_depth, include_file, pretty_print, ignore, pad + "|    ")
+        else:
+            print(pad + "+--- " + file)
 
 
 def _regex_match(f, regex):
