@@ -61,6 +61,12 @@ class TestTreeFunc(unittest.TestCase):
             "          b\n" +\
             "     c\n"
         self.assertEqual(e, r)
+    
+    def test_non_exist(self):
+        self.assertRaises(Exception, tree, 'mock\\unknown')
+    
+    def test_file(self):
+        self.assertRaises(Exception, tree, 'mock\\testfile1')
 
 
 if __name__ == "__main__":
