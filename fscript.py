@@ -108,7 +108,3 @@ def _countln(file, include_blank):
             if len(l.strip()) == 0:
                 count -= 1
     return count
-
-
-if __name__ == "__main__":
-    print(count('C:\\Users\\daniel.xu\\Work\\fc-web-ui-test\\library'))
