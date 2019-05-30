@@ -100,7 +100,7 @@ def _countln_recursive(file, include_blank):
 
 
 def _countln(file, include_blank):
-    with open(file) as f:
+    with open(file, errors="ignore") as f:
         lines = f.readlines()
     count = len(lines)
     if not include_blank:
@@ -108,3 +108,7 @@ def _countln(file, include_blank):
             if len(l.strip()) == 0:
                 count -= 1
     return count
+
+
+if __name__ == "__main__":
+    print(count('C:\\Users\\daniel.xu\\Work\\fc-web-ui-test\\library'))
