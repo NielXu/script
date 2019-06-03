@@ -90,6 +90,36 @@ def count(d, include_blank=False, recursive=True):
     return _countln(d)
 
 
+def scan(d, ignore=[], skip=[], name=[], ext=[], recursive=False):
+    """
+    Scan through the file or directory and return a list of files
+    that matches the given restriction.
+
+    `d` Directory or file
+
+    `ignore=[]` Ignore files that match the given `regex patterns`, they
+    will not be added to the output list
+
+    `skip=[]` Skip the directories that match the `regex patterns`, their
+    children will not be scanned as well
+
+    `name=[]` Only matches files that have the given name, NOT regex
+    patterns but regular `string`
+
+    `ext=[]` Only matches files that have the given extention, NOT regex
+    patterns but regular `string`. Dot are required, for example `.py`
+    or `.txt`
+
+    `recursive=False` Recursively scan all the folders until everything
+    is scanned
+    """
+    if not recursive:
+        return _scan(d, ignore, skip, name, ext)
+    result = []
+    _scan_recursive(d, ignore, skip, name, ext, result)
+    return result
+
+
 def _countln_recursive(file, include_blank):
     if os.path.isfile(file):
         return _countln(file, include_blank)
@@ -108,3 +138,48 @@ def _countln(file, include_blank):
             if len(l.strip()) == 0:
                 count -= 1
     return count
+
+
+def _scan(f, ignore, skip, name, ext):
+    result = []
+    if os.path.isfile(f):
+        if _file_save(f, ignore, name, ext):
+            result.append(f)
+        return result
+    for d in skip:
+        if d in f:
+            return result
+    for file in os.listdir(f):
+        fullpath = os.path.join(f, file)
+        if os.path.isfile(fullpath):
+            if _file_save(fullpath, ignore, name, ext):
+                result.append(fullpath)
+    return result
+
+
+def _scan_recursive(f, ignore, skip, name, ext, result):
+    if os.path.isfile(f):
+        if _file_save(f, ignore, name, ext):
+            result.append(f)
+        return
+    for d in skip:
+        if d in f:
+            return
+    for file in os.listdir(f):
+        fullpath = os.path.join(f, file)
+        _scan_recursive(fullpath, ignore, skip, name, ext, result)
+
+
+def _file_save(f, ignore, name, ext):
+    "Return True if file matches none of the restrictions"
+    fname, fext = os.path.splitext(f)
+    for i in name:
+        if fname == i:
+            return False
+    for i in ext:
+        if i == fext:
+            return False
+    for i in ignore:
+        if re.match(f, i):
+            return False
+    return True
